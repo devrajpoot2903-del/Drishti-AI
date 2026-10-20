@@ -1,0 +1,257 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  INSTITUTION
+  SCRUTINY_OFFICER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  PROCESSING
+  NEEDS_REVIEW
+  CLEARED
+  FAILED
+}
+
+enum FindingSeverity {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum AgentStatus {
+  NOT_STARTED
+  RUNNING
+  COMPLETED
+  SKIPPED
+  FAILED
+  NEEDS_REVIEW
+}
+
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  passwordHash String
+  name         String
+  role         Role           @default(INSTITUTION)
+  department   String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  institutions Institution[]
+  reviews      ReviewAction[]
+  AuditLogs    AuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Institution {
+  id           String        @id @default(uuid())
+  name         String
+  code         String        @unique
+  state        String
+  region       String
+  category     String
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id])
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([code])
+}
+
+model Application {
+  id                 String            @id
+  institutionId      String
+  institution        Institution       @relation(fields: [institutionId], references: [id])
+  category           String
+  approvalType       String
+  academicYear       String
+  status             ApplicationStatus @default(SUBMITTED)
+  riskScore          Float?
+  assignedOfficialId String?
+  summary            String?
+  reviewerNotes      String?
+  documents          Document[]
+  findings           Finding[]
+  executions         AgentExecution[]
+  reviewActions      ReviewAction[]
+  auditLogs          AuditLog[]
+  jobs               ProcessingJob[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([status])
+  @@index([institutionId])
+}
+
+model Document {
+  id                  String               @id @default(uuid())
+  applicationId       String
+  application         Application          @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  originalFilename    String
+  mimeType            String
+  fileSize            Int
+  storagePath         String
+  sha256Hash          String
+  ocrStatus           String               @default("NOT_PROCESSED")
+  extractedText       String?
+  uploadedAt          DateTime             @default(now())
+  extractedFields     ExtractedField[]
+  verificationResults VerificationResult[]
+  findings            Finding[]
+
+  @@index([applicationId])
+  @@index([sha256Hash])
+}
+
+model ExtractedField {
+  id          String   @id @default(uuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  fieldName   String
+  fieldValue  String
+  confidence  Float?
+  boundingBox String? // JSON string of bounding coordinates
+  extractedAt DateTime @default(now())
+
+  @@index([documentId])
+  @@index([fieldName])
+}
+
+model AgentExecution {
+  id               String      @id @default(uuid())
+  applicationId    String
+  application      Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  agentName        String
+  status           AgentStatus @default(NOT_STARTED)
+  durationMs       Int?
+  reason           String?
+  executionDetails String? // JSON string
+  executedAt       DateTime    @default(now())
+
+  @@index([applicationId])
+  @@index([agentName])
+}
+
+model Finding {
+  id            String          @id @default(uuid())
+  applicationId String
+  application   Application     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  documentId    String?
+  document      Document?       @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  category      String
+  severity      FindingSeverity
+  title         String
+  detail        String
+  tool          String?
+  confidence    Float?
+  status        String          @default("OPEN")
+  ruleId        String?
+  evidence      Evidence?
+  createdAt     DateTime        @default(now())
+
+  @@index([applicationId])
+  @@index([severity])
+}
+
+model Evidence {
+  id            String   @id @default(uuid())
+  findingId     String   @unique
+  finding       Finding  @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  documentName  String
+  pageNumber    Int?
+  methodUsed    String
+  description   String
+  originalUrl   String?
+  heatmapUrl    String?
+  boundingBoxes String? // JSON string of detected bounding boxes
+  confidence    Float?
+  createdAt     DateTime @default(now())
+}
+
+model VerificationResult {
+  id              String   @id @default(uuid())
+  documentId      String
+  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  checkType       String // "QR", "DIGITAL_SIGNATURE", "ISSUER_REGISTRY"
+  status          String // "VERIFIED", "MISMATCH", "EXPIRED", "SOURCE_UNAVAILABLE"
+  issuerReference String?
+  details         String? // JSON string
+  verifiedAt      DateTime @default(now())
+
+  @@index([documentId])
+  @@index([checkType])
+}
+
+model ComplianceRule {
+  id           String   @id @default(uuid())
+  ruleId       String   @unique
+  category     String
+  academicYear String
+  condition    String
+  severity     String
+  sourceRef    String
+  isEnabled    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@index([ruleId])
+}
+
+model ReviewAction {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  officerId     String
+  officer       User        @relation(fields: [officerId], references: [id])
+  actionType    String // "APPROVE", "RECTIFICATION", "ESCALATE"
+  justification String
+  createdAt     DateTime    @default(now())
+
+  @@index([applicationId])
+  @@index([officerId])
+}
+
+model AuditLog {
+  id           String       @id @default(uuid())
+  sequence     Int          @default(autoincrement())
+  timestamp    DateTime     @default(now())
+  appId        String?
+  application  Application? @relation(fields: [appId], references: [id], onDelete: SetNull)
+  actorId      String?
+  actor        User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorRole    String
+  action       String
+  resourceRef  String?
+  previousHash String
+  currentHash  String
+
+  @@index([sequence])
+  @@index([appId])
+  @@index([currentHash])
+}
+
+model ProcessingJob {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  status        String      @default("QUEUED") // "QUEUED", "PROCESSING", "COMPLETED", "FAILED"
+  priority      Int         @default(0)
+  attempts      Int         @default(0)
+  errorDetails  String?
+  queuedAt      DateTime    @default(now())
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  @@index([applicationId])
+  @@index([status])
+}

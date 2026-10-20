@@ -1,0 +1,64 @@
+{
+  "version": "APH-2026-2027-PROTOTYPE-v1.0",
+  "applicableAcademicYear": "2026-2027",
+  "authority": "Prototype Scrutiny Model (Based on AICTE Approval Process Handbook Guidelines)",
+  "isAuthoritativeEnactment": false,
+  "description": "Illustrative prototype validation rules modeled on AICTE Approval Process Handbook (APH) provisions for demonstration and verification testing.",
+  "rules": [
+    {
+      "ruleId": "RULE-LAND-01",
+      "ruleType": "PROTOTYPE_ILLUSTRATIVE",
+      "category": "Land and Infrastructure",
+      "severity": "HIGH",
+      "title": "Clear Land Title & Ownership (Prototype Rule)",
+      "condition": "Land title deed must establish contiguous ownership in the name of the Trust/Society/Institution without encumbrance.",
+      "sourceRef": "Modeled on AICTE APH 2024-27 Chapter I, Clause 1.4 (Illustrative Prototype Rule)",
+      "requiredDocumentType": "Land Ownership",
+      "isEnabled": true
+    },
+    {
+      "ruleId": "RULE-FIRE-01",
+      "ruleType": "PROTOTYPE_ILLUSTRATIVE",
+      "category": "Safety and Statutory Clearances",
+      "severity": "HIGH",
+      "title": "Valid Fire and Life Safety Certificate (Prototype Rule)",
+      "condition": "Fire & Life Safety NOC issued by the Competent Authority must remain valid throughout the active academic session.",
+      "sourceRef": "Modeled on AICTE APH 2024-27 Chapter I, Clause 1.8 (Illustrative Prototype Rule)",
+      "requiredDocumentType": "Statutory NOC",
+      "isEnabled": true
+    },
+    {
+      "ruleId": "RULE-OCC-01",
+      "ruleType": "PROTOTYPE_ILLUSTRATIVE",
+      "category": "Building and Occupancy",
+      "severity": "HIGH",
+      "title": "Building Occupancy / Completion Certificate (Prototype Rule)",
+      "condition": "Valid occupancy certificate issued by municipal/local planning authority is mandatory prior to conducting approved technical programs.",
+      "sourceRef": "Modeled on AICTE APH 2024-27 Chapter II, Clause 2.3 (Illustrative Prototype Rule)",
+      "requiredDocumentType": "Building Plan & Occupancy",
+      "isEnabled": true
+    },
+    {
+      "ruleId": "RULE-CADRE-01",
+      "ruleType": "PROTOTYPE_ILLUSTRATIVE",
+      "category": "Faculty and Academic Standards",
+      "severity": "MEDIUM",
+      "title": "Faculty Cadre & Student-Teacher Ratio (Prototype Rule)",
+      "condition": "Faculty-to-student ratio must not exceed 1:20 in Engineering & Technology degree courses, adhering to 1:2:6 cadre ratio (Prof : Assoc Prof : Asst Prof).",
+      "sourceRef": "Modeled on AICTE APH 2024-27 Chapter VII, Table 7.1 (Illustrative Prototype Rule)",
+      "requiredDocumentType": "Faculty Roster",
+      "isEnabled": true
+    },
+    {
+      "ruleId": "RULE-FAC-DUP",
+      "ruleType": "PROTOTYPE_ILLUSTRATIVE",
+      "category": "Faculty Integrity & De-duplication",
+      "severity": "HIGH",
+      "title": "Prohibition of Cross-Institutional Faculty Duplication (Prototype Rule)",
+      "condition": "A faculty member identified by unique statutory identifier (UID/PAN/Aadhaar) cannot be claimed on the active full-time roster of more than one approved institution.",
+      "sourceRef": "Modeled on AICTE APH 2024-27 Norms for Faculty Authentication (Illustrative Prototype Rule)",
+      "requiredDocumentType": "Faculty Roster",
+      "isEnabled": true
+    }
+  ]
+}

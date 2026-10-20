@@ -1,0 +1,461 @@
+{
+  "users": [
+    {
+      "id": "usr_demo_officer_01",
+      "email": "demo-officer@aicte.gov.in",
+      "name": "Dr. A. K. Sharma (Demo Officer)",
+      "role": "SCRUTINY_OFFICER",
+      "passwordHash": "$2a$10$lFeIQgFpfCdMmz9NmyCmieTjg26/Uxx3FMyyCFYCoE.luS41pVFAS",
+      "institutionId": null,
+      "institutionName": null,
+      "designation": "Senior Scrutiny Officer (Demonstration Sandbox)",
+      "isDemoAccount": true,
+      "createdAt": "2026-10-20T19:50:00.000Z"
+    },
+    {
+      "id": "usr_demo_inst_01",
+      "email": "demo-institution@engg.edu",
+      "name": "Apex Institute of Tech (Demo Institution)",
+      "role": "INSTITUTION",
+      "passwordHash": "$2a$10$1155QEym9Cc1DsLVjCVCDeJZwx5IrOBVblak4TtuNj02zYco39GwK",
+      "institutionId": "inst_apex_demo_01",
+      "institutionName": "Apex Institute of Technology (Demonstration Sandbox)",
+      "designation": "Institutional Principal Representative",
+      "isDemoAccount": true,
+      "createdAt": "2026-10-20T19:50:00.000Z"
+    },
+    {
+      "id": "usr_demo_admin_01",
+      "email": "demo-admin@aicte.gov.in",
+      "name": "System Admin (Demo Administrator)",
+      "role": "ADMIN",
+      "passwordHash": "$2a$10$cyG3WX4uzSFg54Gpqlr8S.3.HzhIrSeUTXJSqpWjIoYsXph6v9bN6",
+      "institutionId": null,
+      "institutionName": null,
+      "designation": "AICTE Portal Platform Administrator (Demonstration Sandbox)",
+      "isDemoAccount": true,
+      "createdAt": "2026-10-20T19:50:00.000Z"
+    }
+  ],
+  "institutions": [],
+  "applications": [
+    {
+      "id": "APP-2026-BF24",
+      "institutionName": "Kalinga Institute of Technology (Demo Dossier)",
+      "category": "Engineering & Tech",
+      "program": "Electrical & Electronics Engineering",
+      "academicYear": "2026-27",
+      "status": "Rectification Requested",
+      "submittedAt": "2026-10-20T20:06:52.715Z",
+      "institutionId": "inst_apex_demo_01",
+      "submittedBy": "usr_demo_inst_01",
+      "processingJobId": "job_4d5c4c7a",
+      "updatedAt": "2026-10-20T20:06:53.710Z",
+      "processedAt": "2026-10-20T20:06:53.029Z",
+      "agentExecutions": [
+        {
+          "agentName": "Intake Agent",
+          "status": "COMPLETED",
+          "durationMs": 0,
+          "details": {
+            "category": "Engineering & Tech",
+            "approvalType": "Extension of Approval (EOA)",
+            "requiredChecklist": [
+              "Land Ownership",
+              "Statutory NOC",
+              "Building Plan & Occupancy",
+              "Faculty Roster"
+            ],
+            "submittedDocumentCount": 2,
+            "missingDocumentTypes": [
+              "Building Plan & Occupancy",
+              "Faculty Roster"
+            ],
+            "initialComplianceFlag": false,
+            "routingRecommendations": [
+              {
+                "documentName": "Land_Title_Deed.jpg",
+                "documentType": "Land Ownership",
+                "applicableRoutes": [
+                  "document_extraction",
+                  "forensic_ela",
+                  "qr_verification"
+                ]
+              },
+              {
+                "documentName": "Fire_Safety_NOC.png",
+                "documentType": "Statutory NOC",
+                "applicableRoutes": [
+                  "document_extraction",
+                  "forensic_ela",
+                  "qr_verification"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "agentName": "Document Agent",
+          "status": "COMPLETED",
+          "durationMs": 38,
+          "details": {
+            "extractedCount": 2
+          }
+        },
+        {
+          "agentName": "Forensics Agent",
+          "status": "COMPLETED",
+          "durationMs": 119,
+          "details": {
+            "findingsCount": 1
+          }
+        },
+        {
+          "agentName": "Verification Agent",
+          "status": "SKIPPED",
+          "reason": "Verification skipped: no cryptographic signatures or QR codes detected."
+        },
+        {
+          "agentName": "Compliance Agent",
+          "status": "COMPLETED",
+          "durationMs": 0,
+          "details": {
+            "findingsCount": 3
+          }
+        },
+        {
+          "agentName": "Report Agent",
+          "status": "COMPLETED",
+          "durationMs": 0,
+          "details": {
+            "riskScore": 100,
+            "findingsCount": 4
+          }
+        }
+      ],
+      "processingPlan": {
+        "category": "Engineering & Tech",
+        "approvalType": "Extension of Approval (EOA)",
+        "requiredChecklist": [
+          "Land Ownership",
+          "Statutory NOC",
+          "Building Plan & Occupancy",
+          "Faculty Roster"
+        ],
+        "submittedDocumentCount": 2,
+        "missingDocumentTypes": [
+          "Building Plan & Occupancy",
+          "Faculty Roster"
+        ],
+        "initialComplianceFlag": false,
+        "routingRecommendations": [
+          {
+            "documentName": "Land_Title_Deed.jpg",
+            "documentType": "Land Ownership",
+            "applicableRoutes": [
+              "document_extraction",
+              "forensic_ela",
+              "qr_verification"
+            ]
+          },
+          {
+            "documentName": "Fire_Safety_NOC.png",
+            "documentType": "Statutory NOC",
+            "applicableRoutes": [
+              "document_extraction",
+              "forensic_ela",
+              "qr_verification"
+            ]
+          }
+        ]
+      },
+      "riskScore": 100,
+      "reviewedBy": "Dr. A. K. Sharma (Demo Officer)",
+      "reviewerId": "usr_demo_officer_01",
+      "reviewedAt": "2026-10-20T20:06:53.710Z",
+      "reviewDecision": "Rectification Requested",
+      "reviewNotes": "Deficiency Notice: ELA anomaly detected on Land Title Deed and missing Building Occupancy Certificate. Rectify within 15 days."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc_73a7e918-803",
+      "applicationId": "APP-2026-BF24",
+      "originalFilename": "Land_Title_Deed.jpg",
+      "storageFilename": "doc_73a7e918-803.jpg",
+      "storagePath": "/Users/ashutoshgautam/Personal Project /sneha/aicte-agentic-platform/storage/documents/doc_73a7e918-803.jpg",
+      "mimeType": "image/jpeg",
+      "fileSize": 11721,
+      "sha256": "d4bc12eb9f192b480e247b03a6478e408845e655cf10cf3f3c4bd4ffcaa59b5e",
+      "documentType": "Land Ownership",
+      "status": "UPLOADED",
+      "uploadedAt": "2026-10-20T20:06:52.731Z"
+    },
+    {
+      "id": "doc_4b82692d-037",
+      "applicationId": "APP-2026-BF24",
+      "originalFilename": "Fire_Safety_NOC.png",
+      "storageFilename": "doc_4b82692d-037.png",
+      "storagePath": "/Users/ashutoshgautam/Personal Project /sneha/aicte-agentic-platform/storage/documents/doc_4b82692d-037.png",
+      "mimeType": "image/png",
+      "fileSize": 32816,
+      "sha256": "4cf7b02364b4d6a578c18b8ce7fd3a8d331bc1519541c6c2961b6eb95c1e400b",
+      "documentType": "Statutory NOC",
+      "status": "UPLOADED",
+      "uploadedAt": "2026-10-20T20:06:52.739Z"
+    }
+  ],
+  "findings": [
+    {
+      "applicationId": "APP-2026-BF24",
+      "documentId": null,
+      "title": "Compression Artifact Anomaly Detected via ELA",
+      "category": "Forensics",
+      "severity": "Critical",
+      "description": "Error Level Analysis variance score 1.0 exceeds 0.70 threshold on Fire_Safety_NOC.png.",
+      "impact": "Mandatory Scrutiny Review Required",
+      "ruleRef": null,
+      "methodUsed": "OpenCV Error Level Analysis",
+      "confidence": 100,
+      "requiresReview": true,
+      "id": "03e782ac-dbc3-4fe3-8e6d-552d36449fc1",
+      "createdAt": "2026-10-20T20:06:53.025Z",
+      "evidence": {
+        "description": "High error variance detected (mean diff: 0.28, max dev: 106.0).",
+        "methodUsed": "Error Level Analysis (ELA 90% Quality Delta)",
+        "documentRef": "Fire_Safety_NOC.png",
+        "page": 1,
+        "confidence": 100,
+        "boundingBoxes": [],
+        "imageUrl": "/storage/evidence/ela_doc_4b82692d-037.png",
+        "metadata": null,
+        "id": "ce5f9821-c349-4bd4-b4d9-e083c18b2afb",
+        "findingId": "03e782ac-dbc3-4fe3-8e6d-552d36449fc1",
+        "createdAt": "2026-10-20T20:06:53.025Z"
+      }
+    },
+    {
+      "applicationId": "APP-2026-BF24",
+      "documentId": null,
+      "title": "Mandatory Statutory Document Missing: Building Plan & Occupancy",
+      "category": "Compliance",
+      "severity": "Critical",
+      "description": "Rule RULE-OCC-01 mandate unmet: Valid occupancy certificate issued by municipal/local planning authority is mandatory prior to conducting approved technical programs.",
+      "impact": "Mandatory Scrutiny Review Required",
+      "ruleRef": "RULE-OCC-01",
+      "methodUsed": "AICTE APH Rule Engine",
+      "confidence": null,
+      "requiresReview": true,
+      "id": "eff12b44-703a-4658-8ec7-73ad613302bd",
+      "createdAt": "2026-10-20T20:06:53.026Z",
+      "evidence": {
+        "description": "Source reference: Modeled on AICTE APH 2024-27 Chapter II, Clause 2.3 (Illustrative Prototype Rule). Missing attachment required for statutory approval.",
+        "methodUsed": "APH 2026-27 Regulatory Checklist Validation",
+        "documentRef": "Building Plan & Occupancy",
+        "page": 1,
+        "confidence": null,
+        "boundingBoxes": [],
+        "imageUrl": null,
+        "metadata": null,
+        "id": "fb470748-9710-4e45-8618-fe9918247332",
+        "findingId": "eff12b44-703a-4658-8ec7-73ad613302bd",
+        "createdAt": "2026-10-20T20:06:53.026Z"
+      }
+    },
+    {
+      "applicationId": "APP-2026-BF24",
+      "documentId": null,
+      "title": "Mandatory Statutory Document Missing: Faculty Roster",
+      "category": "Compliance",
+      "severity": "Warning",
+      "description": "Rule RULE-CADRE-01 mandate unmet: Faculty-to-student ratio must not exceed 1:20 in Engineering & Technology degree courses, adhering to 1:2:6 cadre ratio (Prof : Assoc Prof : Asst Prof).",
+      "impact": "Mandatory Scrutiny Review Required",
+      "ruleRef": "RULE-CADRE-01",
+      "methodUsed": "AICTE APH Rule Engine",
+      "confidence": null,
+      "requiresReview": true,
+      "id": "554b10be-75d2-40de-98c9-c4f8032a9326",
+      "createdAt": "2026-10-20T20:06:53.027Z",
+      "evidence": {
+        "description": "Source reference: Modeled on AICTE APH 2024-27 Chapter VII, Table 7.1 (Illustrative Prototype Rule). Missing attachment required for statutory approval.",
+        "methodUsed": "APH 2026-27 Regulatory Checklist Validation",
+        "documentRef": "Faculty Roster",
+        "page": 1,
+        "confidence": null,
+        "boundingBoxes": [],
+        "imageUrl": null,
+        "metadata": null,
+        "id": "65b015e9-bc63-4770-b589-8014e14e5bad",
+        "findingId": "554b10be-75d2-40de-98c9-c4f8032a9326",
+        "createdAt": "2026-10-20T20:06:53.027Z"
+      }
+    },
+    {
+      "applicationId": "APP-2026-BF24",
+      "documentId": null,
+      "title": "Mandatory Statutory Document Missing: Faculty Roster",
+      "category": "Compliance",
+      "severity": "Critical",
+      "description": "Rule RULE-FAC-DUP mandate unmet: A faculty member identified by unique statutory identifier (UID/PAN/Aadhaar) cannot be claimed on the active full-time roster of more than one approved institution.",
+      "impact": "Mandatory Scrutiny Review Required",
+      "ruleRef": "RULE-FAC-DUP",
+      "methodUsed": "AICTE APH Rule Engine",
+      "confidence": null,
+      "requiresReview": true,
+      "id": "5ee7568c-7e2c-4363-b90e-0d15155a44d8",
+      "createdAt": "2026-10-20T20:06:53.028Z",
+      "evidence": {
+        "description": "Source reference: Modeled on AICTE APH 2024-27 Norms for Faculty Authentication (Illustrative Prototype Rule). Missing attachment required for statutory approval.",
+        "methodUsed": "APH 2026-27 Regulatory Checklist Validation",
+        "documentRef": "Faculty Roster",
+        "page": 1,
+        "confidence": null,
+        "boundingBoxes": [],
+        "imageUrl": null,
+        "metadata": null,
+        "id": "7e99d852-c132-4c1a-ab32-53c80a4d0c90",
+        "findingId": "5ee7568c-7e2c-4363-b90e-0d15155a44d8",
+        "createdAt": "2026-10-20T20:06:53.028Z"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "description": "High error variance detected (mean diff: 0.28, max dev: 106.0).",
+      "methodUsed": "Error Level Analysis (ELA 90% Quality Delta)",
+      "documentRef": "Fire_Safety_NOC.png",
+      "page": 1,
+      "confidence": 100,
+      "boundingBoxes": [],
+      "imageUrl": "/storage/evidence/ela_doc_4b82692d-037.png",
+      "metadata": null,
+      "id": "ce5f9821-c349-4bd4-b4d9-e083c18b2afb",
+      "findingId": "03e782ac-dbc3-4fe3-8e6d-552d36449fc1",
+      "createdAt": "2026-10-20T20:06:53.025Z"
+    },
+    {
+      "description": "Source reference: Modeled on AICTE APH 2024-27 Chapter II, Clause 2.3 (Illustrative Prototype Rule). Missing attachment required for statutory approval.",
+      "methodUsed": "APH 2026-27 Regulatory Checklist Validation",
+      "documentRef": "Building Plan & Occupancy",
+      "page": 1,
+      "confidence": null,
+      "boundingBoxes": [],
+      "imageUrl": null,
+      "metadata": null,
+      "id": "fb470748-9710-4e45-8618-fe9918247332",
+      "findingId": "eff12b44-703a-4658-8ec7-73ad613302bd",
+      "createdAt": "2026-10-20T20:06:53.026Z"
+    },
+    {
+      "description": "Source reference: Modeled on AICTE APH 2024-27 Chapter VII, Table 7.1 (Illustrative Prototype Rule). Missing attachment required for statutory approval.",
+      "methodUsed": "APH 2026-27 Regulatory Checklist Validation",
+      "documentRef": "Faculty Roster",
+      "page": 1,
+      "confidence": null,
+      "boundingBoxes": [],
+      "imageUrl": null,
+      "metadata": null,
+      "id": "65b015e9-bc63-4770-b589-8014e14e5bad",
+      "findingId": "554b10be-75d2-40de-98c9-c4f8032a9326",
+      "createdAt": "2026-10-20T20:06:53.027Z"
+    },
+    {
+      "description": "Source reference: Modeled on AICTE APH 2024-27 Norms for Faculty Authentication (Illustrative Prototype Rule). Missing attachment required for statutory approval.",
+      "methodUsed": "APH 2026-27 Regulatory Checklist Validation",
+      "documentRef": "Faculty Roster",
+      "page": 1,
+      "confidence": null,
+      "boundingBoxes": [],
+      "imageUrl": null,
+      "metadata": null,
+      "id": "7e99d852-c132-4c1a-ab32-53c80a4d0c90",
+      "findingId": "5ee7568c-7e2c-4363-b90e-0d15155a44d8",
+      "createdAt": "2026-10-20T20:06:53.028Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "b7ab9bfe-7c19-4917-83d1-140ac248d550",
+      "sequence": 1,
+      "timestamp": "2026-10-20T20:06:52.716Z",
+      "appId": "APP-2026-BF24",
+      "actorId": "usr_demo_inst_01",
+      "actorRole": "INSTITUTION",
+      "action": "APPLICATION_CREATED",
+      "resourceRef": "Application:APP-2026-BF24",
+      "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "currentHash": "b0694a98f93095dc7e47db0beb41e45cc2082c548a43524bf1f9935cf588e1b4",
+      "hashChainStatus": "Verified"
+    },
+    {
+      "id": "d7ac41b7-43f9-4333-ac31-cf6a17cf6cc7",
+      "sequence": 2,
+      "timestamp": "2026-10-20T20:06:52.731Z",
+      "appId": "APP-2026-BF24",
+      "actorId": "usr_demo_inst_01",
+      "actorRole": "INSTITUTION",
+      "action": "DOCUMENT_UPLOADED",
+      "resourceRef": "Document:doc_73a7e918-803",
+      "previousHash": "b0694a98f93095dc7e47db0beb41e45cc2082c548a43524bf1f9935cf588e1b4",
+      "currentHash": "2169f888c95a275ad0a0f10faa45588731bfcf793feab44d868fc0c97621fff5",
+      "hashChainStatus": "Verified"
+    },
+    {
+      "id": "2d82b162-a678-44f2-8b5b-042ee9728c8e",
+      "sequence": 3,
+      "timestamp": "2026-10-20T20:06:52.739Z",
+      "appId": "APP-2026-BF24",
+      "actorId": "usr_demo_inst_01",
+      "actorRole": "INSTITUTION",
+      "action": "DOCUMENT_UPLOADED",
+      "resourceRef": "Document:doc_4b82692d-037",
+      "previousHash": "2169f888c95a275ad0a0f10faa45588731bfcf793feab44d868fc0c97621fff5",
+      "currentHash": "7187199c849211813ea3a3e5c0ec37b4257bcdbca875ca219991ad070f347beb",
+      "hashChainStatus": "Verified"
+    },
+    {
+      "id": "f33f9759-9032-4f96-957f-a05d5ba629a3",
+      "sequence": 4,
+      "timestamp": "2026-10-20T20:06:52.744Z",
+      "appId": "APP-2026-BF24",
+      "actorId": "SYSTEM_QUEUE",
+      "actorRole": "SYSTEM",
+      "action": "JOB_QUEUED",
+      "resourceRef": "Application:APP-2026-BF24",
+      "previousHash": "7187199c849211813ea3a3e5c0ec37b4257bcdbca875ca219991ad070f347beb",
+      "currentHash": "23c869b6bb232dd00fb444052dfbb3ac8b40a9928cde209d5552ee09259f93bc",
+      "hashChainStatus": "Verified"
+    },
+    {
+      "id": "731dc1f3-b872-477a-91c8-72d701b89d89",
+      "sequence": 5,
+      "timestamp": "2026-10-20T20:06:53.030Z",
+      "appId": "APP-2026-BF24",
+      "actorId": "LANGGRAPH_ORCHESTRATOR",
+      "actorRole": "SYSTEM",
+      "action": "AI_PROCESSING_COMPLETED",
+      "resourceRef": "Application:APP-2026-BF24",
+      "previousHash": "23c869b6bb232dd00fb444052dfbb3ac8b40a9928cde209d5552ee09259f93bc",
+      "currentHash": "440e4a665d9cdda0d2685be097ada1060910ae944081793b6094baf888bf6bd4",
+      "hashChainStatus": "Verified"
+    },
+    {
+      "id": "4ae3d57b-7007-4164-8c16-15f2753e3fa7",
+      "sequence": 6,
+      "timestamp": "2026-10-20T20:06:53.711Z",
+      "appId": "APP-2026-BF24",
+      "actorId": "usr_demo_officer_01",
+      "actorRole": "SCRUTINY_OFFICER",
+      "action": "APPLICATION_RECTIFICATION_REQUESTED",
+      "resourceRef": "Application:APP-2026-BF24",
+      "previousHash": "440e4a665d9cdda0d2685be097ada1060910ae944081793b6094baf888bf6bd4",
+      "currentHash": "e0dd1260a5a67a1f39e094b41149d8a195eb72f990d8482098eb348e4dc34d4d",
+      "hashChainStatus": "Verified"
+    }
+  ],
+  "jobs": [],
+  "config": {
+    "baselineManualMinutes": 120,
+    "baselineMethodology": "Illustrative administrative benchmark (120 minutes per institutional pack). Configurable prototype baseline, not a measured AICTE operational claim."
+  }
+}

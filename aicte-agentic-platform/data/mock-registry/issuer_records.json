@@ -1,0 +1,45 @@
+{
+  "_meta": {
+    "notice": "LOCAL PROTOTYPE DEMONSTRATION REGISTRY. This is not a live connection to DigiLocker, AICTE central portal, or state municipal authorities.",
+    "version": "1.0",
+    "updatedAt": "2026-10-21"
+  },
+  "registeredIssuers": [
+    {
+      "issuerId": "STATE-FIRE-MAH-01",
+      "authorityName": "Directorate of Maharashtra Fire Services",
+      "jurisdiction": "Maharashtra",
+      "pkiFingerprint": "9F:A4:12:88:CB:01:44:EE:29:10:55:6A:B8:12:44:09",
+      "knownCertificates": [
+        {
+          "certificateNumber": "MFS/NOC/2026/0842",
+          "issuedTo": "St. Xavier Technical Campus",
+          "validFrom": "2025-07-15",
+          "validUntil": "2026-07-14",
+          "status": "EXPIRED"
+        },
+        {
+          "certificateNumber": "MFS/NOC/2026/1029",
+          "issuedTo": "Delhi Institute of Technology",
+          "validFrom": "2026-01-10",
+          "validUntil": "2027-01-09",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "issuerId": "STATE-REV-DEPT-01",
+      "authorityName": "Inspector General of Registration & Stamps",
+      "jurisdiction": "Maharashtra",
+      "pkiFingerprint": "44:EE:99:A1:02:55:88:12:CB:34:77:88:11:00:AA:BB",
+      "knownCertificates": [
+        {
+          "certificateNumber": "DEED-PUNE-2019-9941",
+          "propertySurveyNo": "Survey No 42/1, Haveli, Pune",
+          "areaAcres": 5.4,
+          "status": "ACTIVE"
+        }
+      ]
+    }
+  ]
+}

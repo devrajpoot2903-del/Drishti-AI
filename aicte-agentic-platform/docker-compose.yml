@@ -1,0 +1,99 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aicte-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aicte_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aicte-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: aicte-ai-service
+    restart: always
+    environment:
+      - PORT=8000
+      - AI_SERVICE_TOKEN=aicte_ai_service_internal_token_2026
+      - STORAGE_DIR=/storage
+    ports:
+      - "8000:8000"
+    volumes:
+      - storage_data:/storage
+      - ./data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: aicte-gateway
+    restart: always
+    environment:
+      - PORT=5001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/aicte_platform?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=aicte_super_secret_jwt_key_development_2026
+      - AI_SERVICE_URL=http://ai-service:8000
+      - AI_SERVICE_TOKEN=aicte_ai_service_internal_token_2026
+      - STORAGE_DIR=/storage
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+    volumes:
+      - storage_data:/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aicte-frontend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=http://gateway:5001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gateway
+
+volumes:
+  postgres_data:
+  redis_data:
+  storage_data:
