@@ -35,7 +35,8 @@ export default function AuditPage() {
       setLoading(true);
       setError(null);
       const data = await fetchAuditLogs();
-      setEvents(data);
+      const sorted = [...data].sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+      setEvents(sorted);
     } catch (err: any) {
       setError(err?.message || "Unable to connect to the server. Please try again.");
     } finally {
@@ -272,7 +273,7 @@ export default function AuditPage() {
                   </thead>
                   <tbody className="divide-y divide-white/[0.06]">
                     {filteredLogs.map((log, idx) => {
-                      const displaySeq = log.sequence || (events.length - idx);
+                      const displaySeq = idx + 1;
                       const isSystem = (log.actorRole || "").includes("SYSTEM") || (log.actor || "").includes("SYSTEM");
                       const isOfficer = (log.actorRole || "").includes("OFFICER") || (log.actor || "").includes("OFFICER");
                       const hashText = log.hash || log.currentHash || "SHA-256-RECORD";
