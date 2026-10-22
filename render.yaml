@@ -1,0 +1,47 @@
+services:
+  # 1. Next.js Frontend
+  - type: web
+    name: drishti-frontend
+    env: node
+    rootDir: aicte-agentic-platform/frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: drishti-gateway
+          envVarKey: RENDER_EXTERNAL_URL
+
+  # 2. Fastify API Gateway
+  - type: web
+    name: drishti-gateway
+    env: node
+    rootDir: aicte-agentic-platform/gateway
+    buildCommand: npm install && npm run build
+    startCommand: node dist/server.js
+    envVars:
+      - key: PORT
+        value: 5001
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AI_SERVICE_URL
+        fromService:
+          type: web
+          name: drishti-ai-service
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: AI_SERVICE_TOKEN
+        value: aicte_ai_service_internal_token_2026
+
+  # 3. Python AI Multi-Agent Service
+  - type: web
+    name: drishti-ai-service
+    env: python
+    rootDir: aicte-agentic-platform/ai-service
+    buildCommand: pip install -r requirements.txt && pip install reportlab qrcode pymupdf pillow opencv-python-headless
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: AI_SERVICE_TOKEN
+        value: aicte_ai_service_internal_token_2026
