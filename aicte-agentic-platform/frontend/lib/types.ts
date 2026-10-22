@@ -100,6 +100,12 @@ export interface Application {
   findings: Finding[];
   history: AuditEvent[];
   reviewerNotes?: string;
+  institutionId?: string;
+  submittedBy?: string;
+  reviewedAt?: string;
+  reviewDecision?: string;
+  reviewNotes?: string;
+  verificationResults?: any[];
   agentExecutions?: any[];
 }
 

@@ -95,7 +95,19 @@ export const db = {
     if (filter?.status) {
       apps = apps.filter((a) => a.status === filter.status);
     }
-    return apps;
+    if (filter?.institutionId) {
+      apps = apps.filter((a) => a.institutionId === filter.institutionId);
+    }
+    return apps.map((app) => ({
+      ...app,
+      documents: (state.documents || []).filter((d) => d.applicationId === app.id),
+      findings: (state.findings || []).filter((f) => f.applicationId === app.id).map((f) => ({
+        ...f,
+        evidence: (state.evidence || []).find((e) => e.findingId === f.id) || null
+      })),
+      verificationResults: (state.verificationResults || []).filter((v: any) => v.applicationId === app.id),
+      history: (state.auditLogs || []).filter((a) => a.appId === app.id)
+    }));
   },
   findApplicationById: (id: string) => {
     const state = loadLocalDb();
@@ -108,7 +120,8 @@ export const db = {
         ...f,
         evidence: state.evidence.find((e) => e.findingId === f.id) || null
       })),
-      history: state.auditLogs.filter((a) => a.appId === id)
+      history: (state.auditLogs || []).filter((a) => a.appId === id),
+      verificationResults: (state.verificationResults || []).filter((v: any) => v.applicationId === id)
     };
   },
   createApplication: (app: any) => {

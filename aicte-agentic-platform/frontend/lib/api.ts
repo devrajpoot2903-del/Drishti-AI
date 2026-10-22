@@ -300,8 +300,9 @@ export async function fetchWorkflow(appId?: string): Promise<AgentWorkflowStage[
   return [];
 }
 
-export async function fetchAuditLogs(): Promise<AuditEvent[]> {
-  const res = await fetch(`${BASE_URL}/api/audit`, {
+export async function fetchAuditLogs(applicationId?: string): Promise<AuditEvent[]> {
+  const url = applicationId ? `${BASE_URL}/api/audit?applicationId=${encodeURIComponent(applicationId)}` : `${BASE_URL}/api/audit`;
+  const res = await fetch(url, {
     headers: getAuthHeaders(),
     cache: "no-store"
   });
