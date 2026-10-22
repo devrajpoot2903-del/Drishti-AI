@@ -1,0 +1,10 @@
+{
+  "name": "drishti-ai",
+  "version": "1.0.0",
+  "description": "Drishti-AI: AICTE Agentic Decision-Support Platform",
+  "scripts": {
+    "dev": "bash start.sh",
+    "start": "bash start.sh",
+    "test": "cd aicte-agentic-platform/gateway && npx ts-node test/gateway.test.ts"
+  }
+}

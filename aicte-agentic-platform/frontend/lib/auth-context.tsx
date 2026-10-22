@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UserSession, getStoredToken, setStoredToken, getStoredUser, setStoredUser, clearSession } from "./auth";
-import { loginApi } from "./api";
+import { loginApi, fetchCurrentUserApi } from "./api";
 
 interface AuthContextType {
   user: UserSession | null;
@@ -22,12 +22,11 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true
 });
 
-const DEMO_ACCOUNTS = {
+export const DEMO_ACCOUNTS = {
   SCRUTINY_OFFICER: { email: "demo-officer@aicte.gov.in", password: "DemoOfficer#AICTE2026!" },
   INSTITUTION: { email: "demo-institution@engg.edu", password: "DemoInst#AICTE2026!" },
   ADMIN: { email: "demo-admin@aicte.gov.in", password: "DemoAdmin#AICTE2026!" }
 };
-
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserSession | null>(null);
@@ -40,26 +39,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const existingUser = getStoredUser();
 
       if (existingToken && existingUser) {
-        setToken(existingToken);
-        setUser(existingUser);
-        setIsLoading(false);
-      } else {
-        // Default initial session: Scrutiny Officer
         try {
-          const res = await loginApi(DEMO_ACCOUNTS.SCRUTINY_OFFICER.email, DEMO_ACCOUNTS.SCRUTINY_OFFICER.password);
-          setStoredToken(res.token);
-          setStoredUser(res.user);
-          setToken(res.token);
-          setUser(res.user);
-        } catch (err) {
-          console.warn("Could not auto-login to gateway. Gateway may be initializing:", err);
-        } finally {
-          setIsLoading(false);
+          // Verify with backend that stored session is active and valid
+          const meRes = await fetchCurrentUserApi();
+          if (meRes?.user) {
+            setToken(existingToken);
+            setUser(meRes.user);
+            setStoredUser(meRes.user);
+            setIsLoading(false);
+            return;
+          }
+        } catch {
+          console.warn("Stored session token is invalid or expired. Clearing session.");
+          clearSession();
         }
       }
+
+      // Do NOT automatically authenticate users as Scrutiny Officer
+      setUser(null);
+      setToken(null);
+      setIsLoading(false);
     }
 
     initAuth();
+
+    const handleSessionExpired = () => {
+      console.warn("Session expired. Clearing session. User must log in again.");
+      clearSession();
+      setUser(null);
+      setToken(null);
+    };
+
+    window.addEventListener("auth-session-expired", handleSessionExpired);
+    return () => window.removeEventListener("auth-session-expired", handleSessionExpired);
   }, []);
 
   const login = async (email: string, password: string) => {

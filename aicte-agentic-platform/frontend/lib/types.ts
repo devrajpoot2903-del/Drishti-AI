@@ -3,7 +3,11 @@ export type ApplicationStatus =
   | "Processing"
   | "Needs Review"
   | "Cleared"
-  | "Failed";
+  | "Approved"
+  | "Rectification Requested"
+  | "Escalated"
+  | "Failed"
+  | "Processing Failed";
 
 export type FindingSeverity = "High" | "Medium" | "Low";
 
@@ -81,6 +85,12 @@ export interface Application {
   assignedOfficial?: string;
   reviewedBy?: string;
   riskScore?: number;
+  documentAuthenticityRisk?: number;
+  applicationComplianceRisk?: number;
+  authenticityAssessment?: string;
+  complianceAssessment?: string;
+  authenticityExplanation?: string;
+  complianceExplanation?: string;
   summary?: string;
   documents: DocumentItem[];
   findings: Finding[];

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 interface HeaderProps {
   title?: string;
@@ -10,25 +11,23 @@ interface HeaderProps {
   showNewButton?: boolean;
 }
 
-import { useAuth } from "@/lib/auth-context";
-
 export function Header({
   title = "Overview",
   subtitle = "Regulatory scrutiny & institutional decision support",
   showNewButton = true,
 }: HeaderProps) {
   const { user } = useAuth();
-  const initials = user ? user.name.slice(0, 2).toUpperCase() : "AI";
+  const initials = user ? user.name.slice(0, 2).toUpperCase() : "--";
   const userTitle = user ? `${user.name} (${user.role})` : "Authenticated Session";
 
   return (
-    <header className="h-16 border-b border-slate-200 bg-white sticky top-0 z-30 flex items-center justify-between px-6">
+    <header className="h-16 border-b border-white/10 bg-[#0c0d12]/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-6">
       {/* Title & Subtitle */}
       <div>
-        <h1 className="text-base font-semibold text-slate-900 tracking-tight">
+        <h1 className="text-base font-semibold text-white tracking-tight">
           {title}
         </h1>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-gray-400">
           {subtitle}
         </p>
       </div>
@@ -38,7 +37,7 @@ export function Header({
         {showNewButton && (
           <Link
             href="/upload"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition-colors"
+            className="drishti-button text-xs py-1.5 px-3 inline-flex items-center gap-1.5 shadow-md shadow-red-500/20"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Application</span>
@@ -47,17 +46,16 @@ export function Header({
 
         <div className="flex items-center gap-2">
           <div
-            className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center select-none"
+            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-white font-semibold text-xs flex items-center justify-center select-none"
             title={userTitle}
           >
             {initials}
           </div>
-          <span className="text-xs text-slate-600 font-medium hidden sm:inline">
-            {user ? user.name.split(" ")[0] : "Officer"}
+          <span className="text-xs text-gray-300 font-medium hidden sm:inline">
+            {user ? user.name.split(" ")[0] : "Guest"}
           </span>
         </div>
       </div>
     </header>
   );
 }
-

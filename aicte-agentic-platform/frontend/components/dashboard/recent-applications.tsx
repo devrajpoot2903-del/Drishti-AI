@@ -14,6 +14,8 @@ import {
   ShieldAlert,
   ArrowUpRight,
   ExternalLink,
+  FileDown,
+  UploadCloud,
 } from "lucide-react";
 import { Application, Finding } from "@/lib/types";
 import { EvidenceModal } from "./evidence-modal";
@@ -21,8 +23,13 @@ import {
   approveApplicationApi,
   rectifyApplicationApi,
   escalateApplicationApi,
+  downloadReportApi,
+  resubmitDocumentApi,
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { AgentTimeline } from "@/components/drishti/agent-timeline";
+import { OCRViewer } from "@/components/drishti/ocr-viewer";
+import { VerificationLadder } from "@/components/drishti/verification-ladder";
 
 interface RecentApplicationsTableProps {
   applications: Application[];
@@ -44,8 +51,9 @@ export function RecentApplicationsTable({
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "Overview" | "Documents" | "AI Findings" | "Review History"
+    "Overview" | "Documents" | "OCR Extraction" | "AI Findings" | "Agent Timeline" | "Review History"
   >("Overview");
+  const [downloadingReport, setDownloadingReport] = useState(false);
 
   // Evidence Modal state
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
@@ -63,40 +71,75 @@ export function RecentApplicationsTable({
     text: string;
   } | null>(null);
 
+  const handleDownloadReport = async (appId: string) => {
+    try {
+      setDownloadingReport(true);
+      const blob = await downloadReportApi(appId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `drishti-scrutiny-report-${appId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err?.message || "Failed to download PDF report");
+    } finally {
+      setDownloadingReport(false);
+    }
+  };
+
   const filtered = applications.filter(
     (app) =>
       app.institutionName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getStatusBadge = (status: Application["status"]) => {
+  const getStatusBadge = (status: Application["status"] | string) => {
     switch (status) {
+      case "Approved":
       case "Cleared":
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-            Cleared
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            {status}
           </span>
         );
       case "Needs Review":
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            <AlertCircle className="w-3 h-3 text-amber-600" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+            <AlertCircle className="w-3 h-3 text-amber-400" />
             Needs Review
           </span>
         );
       case "Processing":
+      case "Queued":
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
-            <Clock className="w-3 h-3 text-indigo-600" />
-            Processing
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+            <Clock className="w-3 h-3 text-indigo-400" />
+            {status}
+          </span>
+        );
+      case "Rectification Requested":
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+            <ShieldAlert className="w-3 h-3 text-rose-400" />
+            Rectification
+          </span>
+        );
+      case "Escalated":
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+            <AlertCircle className="w-3 h-3 text-purple-400" />
+            Escalated
           </span>
         );
       case "Submitted":
       default:
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-            Submitted
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+            {status || "Submitted"}
           </span>
         );
     }
@@ -160,14 +203,14 @@ export function RecentApplicationsTable({
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg border border-slate-200 p-8 text-center space-y-3">
-        <p className="text-xs text-rose-700 font-medium">
+      <div className="bg-[#101116] rounded-xl border border-white/10 p-8 text-center space-y-3">
+        <p className="text-xs text-rose-400 font-medium">
           Unable to connect to the server. Please try again.
         </p>
         {onRefresh && (
           <button
             onClick={onRefresh}
-            className="px-3 py-1.5 rounded-md text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+            className="px-3 py-1.5 rounded-md text-xs font-medium text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
           >
             Retry Connection
           </button>
@@ -177,27 +220,27 @@ export function RecentApplicationsTable({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200">
+    <div className="bg-[#101116] rounded-xl border border-white/10 shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-4 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/[0.01]">
         <div>
-          <h2 className="text-sm font-semibold text-slate-900 tracking-tight">
+          <h2 className="text-sm font-semibold text-white tracking-tight">
             Recent Applications
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Submitted applications and regulatory validation status
           </p>
         </div>
 
         {applications.length > 0 && (
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-500" />
             <input
               type="text"
               placeholder="Search by ID or institution..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-md text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white/[0.04] border border-white/10 rounded-md text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500/50"
             />
           </div>
         )}
@@ -210,16 +253,16 @@ export function RecentApplicationsTable({
         </div>
       ) : applications.length === 0 ? (
         <div className="p-12 text-center space-y-3">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             No applications have been submitted yet.
           </p>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[11px] text-slate-500">
             Upload your first application to begin document validation.
           </p>
           <div className="pt-2">
             <Link
               href="/upload"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New Application</span>
@@ -230,7 +273,7 @@ export function RecentApplicationsTable({
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
+              <tr className="bg-white/[0.02] border-b border-white/10 text-slate-400 font-medium">
                 <th className="py-2.5 px-4">Application ID</th>
                 <th className="py-2.5 px-4">Institution</th>
                 <th className="py-2.5 px-4">Submission Date</th>
@@ -239,7 +282,7 @@ export function RecentApplicationsTable({
                 <th className="py-2.5 px-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/5">
               {filtered.map((app) => (
                 <tr
                   key={app.id}
@@ -249,20 +292,20 @@ export function RecentApplicationsTable({
                     setActionType(null);
                     setActionMessage(null);
                   }}
-                  className="hover:bg-slate-50/80 cursor-pointer transition-colors"
+                  className="hover:bg-white/[0.04] active:bg-white/[0.06] cursor-pointer transition-colors"
                 >
-                  <td className="py-3 px-4 font-mono font-medium text-indigo-600">
+                  <td className="py-3 px-4 font-mono font-medium text-indigo-400">
                     {app.id}
                   </td>
                   <td className="py-3 px-4">
-                    <div className="font-medium text-slate-900">
+                    <div className="font-medium text-white">
                       {app.institutionName}
                     </div>
                     <div className="text-[11px] text-slate-400">
                       {app.category}
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">
+                  <td className="py-3 px-4 text-slate-400 font-mono text-[11px]">
                     {app.submissionDate}
                   </td>
                   <td className="py-3 px-4 font-mono">
@@ -270,16 +313,16 @@ export function RecentApplicationsTable({
                       <span
                         className={
                           app.riskScore >= 70
-                            ? "text-rose-600 font-medium"
+                            ? "text-rose-400 font-medium"
                             : app.riskScore >= 40
-                            ? "text-amber-600 font-medium"
-                            : "text-emerald-600 font-medium"
+                            ? "text-amber-400 font-medium"
+                            : "text-emerald-400 font-medium"
                         }
                       >
                         {app.riskScore}/100
                       </span>
                     ) : (
-                      <span className="text-slate-400">—</span>
+                      <span className="text-slate-500">—</span>
                     )}
                   </td>
                   <td className="py-3 px-4">{getStatusBadge(app.status)}</td>
@@ -292,7 +335,7 @@ export function RecentApplicationsTable({
                         setActionType(null);
                         setActionMessage(null);
                       }}
-                      className="px-2.5 py-1 rounded text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                      className="px-2.5 py-1 rounded text-xs font-medium text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                     >
                       View
                     </button>
@@ -306,44 +349,65 @@ export function RecentApplicationsTable({
 
       {/* Tabbed Application Details Modal */}
       {selectedApp && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg border border-slate-200 shadow-xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[85vh]">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#101116] rounded-xl border border-white/10 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[85vh] text-slate-100">
             {/* Modal Header */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-semibold text-indigo-600">
+                  <span className="font-mono text-xs font-semibold text-indigo-400">
                     {selectedApp.id}
                   </span>
-                  <span className="text-xs text-slate-400">•</span>
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-slate-500">•</span>
+                  <span className="text-xs text-slate-400">
                     {selectedApp.category}
                   </span>
                 </div>
-                <h3 className="text-sm font-semibold text-slate-900 mt-0.5">
+                <h3 className="text-sm font-semibold text-white mt-0.5">
                   {selectedApp.institutionName}
                 </h3>
               </div>
-              <button
-                onClick={() => setSelectedApp(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadReport(selectedApp.id)}
+                  disabled={downloadingReport}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors"
+                  title="Generate regulatory decision-support scrutiny PDF report"
+                >
+                  {downloadingReport ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                      <span>Generating PDF...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileDown className="w-3.5 h-3.5" />
+                      <span>PDF Scrutiny Report</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setSelectedApp(null)}
+                  className="p-1 rounded text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* Four Clean Tabs */}
-            <div className="flex items-center border-b border-slate-200 px-4 bg-white text-xs font-medium text-slate-500">
+            {/* Clean Tabs with OCR Extraction */}
+            <div className="flex items-center border-b border-white/10 px-4 bg-[#101116] text-xs font-medium text-slate-400 overflow-x-auto">
               {(
-                ["Overview", "Documents", "AI Findings", "Review History"] as const
+                ["Overview", "Documents", "OCR Extraction", "AI Findings", "Agent Timeline", "Review History"] as const
               ).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-2.5 px-3 border-b-2 transition-colors ${
+                  className={`py-2.5 px-3 border-b-2 whitespace-nowrap transition-colors ${
                     activeTab === tab
-                      ? "border-indigo-600 text-indigo-600 font-semibold"
-                      : "border-transparent hover:text-slate-900"
+                      ? "border-red-500 text-red-400 font-semibold"
+                      : "border-transparent hover:text-slate-200"
                   }`}
                 >
                   {tab}
@@ -357,31 +421,79 @@ export function RecentApplicationsTable({
               {activeTab === "Overview" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded border border-slate-200 bg-slate-50">
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/[0.02]">
+                      <div className="text-[10px] uppercase font-medium text-slate-400">
+                        Document Authenticity Risk
+                      </div>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="font-mono text-base font-semibold text-white">
+                          {selectedApp.documentAuthenticityRisk !== undefined ? `${selectedApp.documentAuthenticityRisk}/100` : "0/100"}
+                        </span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                          selectedApp.authenticityAssessment === "HIGH_RISK"
+                            ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                            : selectedApp.authenticityAssessment === "SUSPICIOUS"
+                            ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                            : selectedApp.authenticityAssessment === "INCONCLUSIVE"
+                            ? "bg-slate-500/10 border-slate-500/30 text-slate-400"
+                            : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                        }`}>
+                          {selectedApp.authenticityAssessment || "LOW_RISK"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[11px] text-slate-400 leading-snug">
+                        {selectedApp.authenticityExplanation || "Forensic & verification evidence summary."}
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/[0.02]">
+                      <div className="text-[10px] uppercase font-medium text-slate-400">
+                        Application Compliance Risk
+                      </div>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="font-mono text-base font-semibold text-white">
+                          {selectedApp.applicationComplianceRisk !== undefined ? `${selectedApp.applicationComplianceRisk}/100` : "0/100"}
+                        </span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                          (selectedApp.applicationComplianceRisk || 0) >= 40
+                            ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                            : (selectedApp.applicationComplianceRisk || 0) > 0
+                            ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                            : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                        }`}>
+                          {selectedApp.complianceAssessment || "COMPLIANT"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[11px] text-slate-400 leading-snug">
+                        {selectedApp.complianceExplanation || "Regulatory checklist evaluation."}
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/[0.02]">
                       <div className="text-[10px] uppercase font-medium text-slate-400">
                         Application Type
                       </div>
-                      <div className="mt-1 font-medium text-slate-800">
+                      <div className="mt-1 font-medium text-white">
                         {selectedApp.approvalType}
                       </div>
                     </div>
-                    <div className="p-3 rounded border border-slate-200 bg-slate-50">
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/[0.02]">
                       <div className="text-[10px] uppercase font-medium text-slate-400">
                         Academic Year
                       </div>
-                      <div className="mt-1 font-mono text-slate-800">
+                      <div className="mt-1 font-mono text-white">
                         {selectedApp.academicYear}
                       </div>
                     </div>
-                    <div className="p-3 rounded border border-slate-200 bg-slate-50">
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/[0.02]">
                       <div className="text-[10px] uppercase font-medium text-slate-400">
                         Submission Date
                       </div>
-                      <div className="mt-1 font-mono text-slate-800">
+                      <div className="mt-1 font-mono text-white">
                         {selectedApp.submissionDate}
                       </div>
                     </div>
-                    <div className="p-3 rounded border border-slate-200 bg-slate-50">
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/[0.02]">
                       <div className="text-[10px] uppercase font-medium text-slate-400">
                         Current Status
                       </div>
@@ -390,58 +502,91 @@ export function RecentApplicationsTable({
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-slate-800 mb-1">
+                    <h4 className="text-xs font-semibold text-white mb-1">
                       Scrutiny Summary
                     </h4>
-                    <p className="text-xs text-slate-600 p-3 rounded border border-slate-200 bg-slate-50 leading-relaxed">
+                    <p className="text-xs text-slate-300 p-3 rounded-lg border border-white/10 bg-white/[0.02] leading-relaxed">
                       {selectedApp.summary ||
                         "Application registered. Awaiting automated or manual scrutiny execution."}
                     </p>
                   </div>
+
+                  {/* Verification Ladder Section (Feature 1) */}
+                  <div className="pt-2 border-t border-white/10">
+                    <VerificationLadder applicationId={selectedApp.id} />
+                  </div>
                 </div>
               )}
 
-              {/* Tab 2: Documents */}
+              {/* Tab 2: Documents with Version Tracking (Feature 4) */}
               {activeTab === "Documents" && (
-                <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-800 mb-2">
-                    Attached Documents ({selectedApp.documents.length})
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-semibold text-white">
+                      Attached Documents & Version Ledger ({selectedApp.documents.length})
+                    </div>
+                    {selectedApp.status === "Rectification Requested" && (
+                      <span className="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                        Rectification Active: Version Resubmission Permitted
+                      </span>
+                    )}
                   </div>
                   {selectedApp.documents.length === 0 ? (
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       No documents attached to this application.
                     </p>
                   ) : (
                     selectedApp.documents.map((doc) => (
                       <div
                         key={doc.id}
-                        className="p-3 rounded border border-slate-200 bg-white flex items-center justify-between"
+                        className="p-3.5 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between hover:border-white/20 transition-colors"
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 shrink-0">
+                            <FileText className="w-4 h-4" />
+                          </div>
                           <div className="min-w-0">
-                            <div className="font-medium text-slate-800 truncate">
-                              {doc.name}
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white truncate text-xs">
+                                {doc.name}
+                              </span>
+                              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                v{(doc as any).revision || 1}
+                              </span>
+                              {(doc as any).isCurrent === false && (
+                                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-500/20 text-slate-400 border border-white/10">
+                                  Superseded
+                                </span>
+                              )}
                             </div>
-                            <div className="text-[10px] text-slate-400 font-mono truncate">
+                            <div className="text-[10px] text-slate-400 font-mono truncate mt-0.5">
                               SHA-256: {doc.hash}
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 shrink-0 ml-2">
-                          {doc.ocrStatus}
-                        </span>
+                        <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            {doc.ocrStatus || "EXTRACTED"}
+                          </span>
+                        </div>
                       </div>
                     ))
                   )}
                 </div>
               )}
 
-              {/* Tab 3: AI Findings with View Evidence button */}
+              {/* Tab 3: OCR Extraction (Feature 2) */}
+              {activeTab === "OCR Extraction" && (
+                <div className="pt-1">
+                  <OCRViewer applicationId={selectedApp.id} />
+                </div>
+              )}
+
+              {/* Tab 4: AI Findings with View Evidence button */}
               {activeTab === "AI Findings" && (
                 <div className="space-y-3">
                   {selectedApp.findings.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded border border-slate-200">
+                    <div className="p-8 text-center text-xs text-slate-400 bg-white/[0.02] rounded-lg border border-white/10">
                       No AI findings available. Document analysis has not been
                       completed.
                     </div>
@@ -449,20 +594,20 @@ export function RecentApplicationsTable({
                     selectedApp.findings.map((finding) => (
                       <div
                         key={finding.id}
-                        className="p-3.5 rounded border border-slate-200 bg-slate-50 space-y-2"
+                        className="p-3.5 rounded-lg border border-white/10 bg-white/[0.02] space-y-2"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-slate-900">
+                          <span className="font-semibold text-white">
                             {finding.title}
                           </span>
                           <div className="flex items-center gap-2">
                             <span
-                              className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${
+                              className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
                                 finding.severity === "High"
-                                  ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                  ? "bg-rose-500/10 text-rose-300 border border-rose-500/20"
                                   : finding.severity === "Medium"
-                                  ? "bg-amber-50 text-amber-700 border border-amber-200"
-                                  : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                  ? "bg-amber-500/10 text-amber-300 border border-amber-500/20"
+                                  : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
                               }`}
                             >
                               {finding.severity} Severity
@@ -470,7 +615,7 @@ export function RecentApplicationsTable({
                             {/* View Evidence Button */}
                             <button
                               onClick={() => handleOpenEvidence(finding)}
-                              className="px-2 py-0.5 rounded text-[11px] font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-colors inline-flex items-center gap-1"
+                              className="px-2 py-0.5 rounded text-[11px] font-medium text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors inline-flex items-center gap-1"
                             >
                               <span>View Evidence</span>
                               <ExternalLink className="w-3 h-3" />
@@ -478,13 +623,13 @@ export function RecentApplicationsTable({
                           </div>
                         </div>
 
-                        <p className="text-slate-600 text-[11px] leading-relaxed">
+                        <p className="text-slate-300 text-[11px] leading-relaxed">
                           {finding.detail}
                         </p>
 
                         {finding.supportingEvidence && (
-                          <div className="text-[11px] text-slate-700 bg-white p-2 rounded border border-slate-200">
-                            <span className="font-semibold text-slate-600">
+                          <div className="text-[11px] text-slate-300 bg-white/[0.03] p-2 rounded border border-white/10">
+                            <span className="font-semibold text-slate-400">
                               Supporting Evidence:{" "}
                             </span>
                             {finding.supportingEvidence}
@@ -509,12 +654,12 @@ export function RecentApplicationsTable({
               {/* Tab 4: Review History */}
               {activeTab === "Review History" && (
                 <div className="space-y-3">
-                  <div className="text-xs font-semibold text-slate-800">
+                  <div className="text-xs font-semibold text-white">
                     Application Audit History
                   </div>
 
                   {selectedApp.history.length === 0 ? (
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       No review actions recorded yet.
                     </p>
                   ) : (
@@ -522,16 +667,16 @@ export function RecentApplicationsTable({
                       {selectedApp.history.map((h) => (
                         <div
                           key={h.id}
-                          className="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-start gap-2"
+                          className="p-2.5 rounded-lg border border-white/10 bg-white/[0.02] flex items-start gap-2"
                         >
                           <span className="text-[10px] font-mono text-slate-400 whitespace-nowrap mt-0.5">
                             {h.timestamp}
                           </span>
                           <div className="min-w-0">
-                            <span className="font-semibold text-slate-800">
+                            <span className="font-semibold text-white">
                               {h.actor}:
                             </span>{" "}
-                            <span className="text-slate-600 text-[11px]">
+                            <span className="text-slate-300 text-[11px]">
                               {h.action}
                             </span>
                           </div>
@@ -542,24 +687,30 @@ export function RecentApplicationsTable({
                 </div>
               )}
 
+              {/* Tab: Agent Execution Timeline */}
+              {activeTab === "Agent Timeline" && (
+                <div className="space-y-4">
+                  <AgentTimeline applicationId={selectedApp.id} />
+                </div>
+              )}
+
               {/* Human Review Action Controls (Approve | Request Rectification | Escalate) */}
-              <div className="pt-3 border-t border-slate-200 space-y-3 bg-slate-50/70 p-3 rounded-lg border">
+              <div className="pt-3 border-t border-white/10 space-y-3 bg-white/[0.02] p-3 rounded-lg border border-white/10">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-800">
+                  <span className="text-xs font-semibold text-white">
                     Authorized Official Determination
                   </span>
-                  <span className="text-[10px] text-slate-500 font-medium">
+                  <span className="text-[10px] text-slate-400 font-medium">
                     {user ? `Official: ${user.name} (${user.role})` : "Authenticated Official"}
                   </span>
-
                 </div>
 
                 {actionMessage && (
                   <div
                     className={`p-2.5 rounded text-xs ${
                       actionMessage.type === "success"
-                        ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                        : "bg-rose-50 text-rose-800 border border-rose-200"
+                        ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
+                        : "bg-rose-500/10 text-rose-300 border border-rose-500/20"
                     }`}
                   >
                     {actionMessage.text}
@@ -577,21 +728,21 @@ export function RecentApplicationsTable({
                     </button>
                     <button
                       onClick={() => setActionType("rectify")}
-                      className="px-3 py-1.5 rounded text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+                      className="px-3 py-1.5 rounded text-xs font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
                     >
                       Request Rectification
                     </button>
                     <button
                       onClick={() => setActionType("escalate")}
-                      className="px-3 py-1.5 rounded text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors"
+                      className="px-3 py-1.5 rounded text-xs font-medium text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                     >
                       Escalate
                     </button>
                   </div>
                 ) : (
-                  <div className="p-3 bg-white rounded border border-slate-200 space-y-2">
+                  <div className="p-3 bg-white/[0.03] rounded-lg border border-white/10 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-900 capitalize">
+                      <span className="text-xs font-semibold text-white capitalize">
                         Confirm Decision: {actionType}
                       </span>
                       <button
@@ -601,7 +752,7 @@ export function RecentApplicationsTable({
                           setIsConfirmed(false);
                           setActionMessage(null);
                         }}
-                        className="text-[11px] text-slate-400 hover:text-slate-600"
+                        className="text-[11px] text-slate-400 hover:text-white"
                       >
                         Cancel
                       </button>
@@ -609,12 +760,12 @@ export function RecentApplicationsTable({
 
                     {actionType === "approve" ? (
                       <div className="space-y-2">
-                        <label className="flex items-start gap-2 cursor-pointer text-xs text-slate-700">
+                        <label className="flex items-start gap-2 cursor-pointer text-xs text-slate-300">
                           <input
                             type="checkbox"
                             checked={isConfirmed}
                             onChange={(e) => setIsConfirmed(e.target.checked)}
-                            className="mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                            className="mt-0.5 rounded border-white/20 bg-white/5 text-red-600 focus:ring-red-500"
                           />
                           <span>
                             I confirm that statutory norms under APH 2026–27 have been
@@ -626,12 +777,12 @@ export function RecentApplicationsTable({
                           placeholder="Optional approval notes or conditions..."
                           value={actionReason}
                           onChange={(e) => setActionReason(e.target.value)}
-                          className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-2.5 py-1.5 text-xs bg-white/[0.04] border border-white/10 rounded text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500"
                         />
                       </div>
                     ) : (
                       <div className="space-y-1.5">
-                        <label className="block text-[11px] font-medium text-slate-700">
+                        <label className="block text-[11px] font-medium text-slate-300">
                           {actionType === "rectify"
                             ? "Documented Rectification Mandate:"
                             : "Escalation Justification for Standing Appellate Committee:"}
@@ -646,7 +797,7 @@ export function RecentApplicationsTable({
                           }
                           value={actionReason}
                           onChange={(e) => setActionReason(e.target.value)}
-                          className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-2.5 py-1.5 text-xs bg-white/[0.04] border border-white/10 rounded text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500"
                         />
                       </div>
                     )}
@@ -655,7 +806,7 @@ export function RecentApplicationsTable({
                       <button
                         onClick={handleExecuteAction}
                         disabled={actionLoading}
-                        className="px-3 py-1.5 rounded text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                        className="px-3 py-1.5 rounded text-xs font-medium text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50"
                       >
                         {actionLoading ? "Recording Decision..." : "Submit Determination"}
                       </button>
@@ -666,10 +817,10 @@ export function RecentApplicationsTable({
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-slate-200 bg-slate-50 flex justify-end">
+            <div className="p-3 border-t border-white/10 bg-white/[0.02] flex justify-end">
               <button
                 onClick={() => setSelectedApp(null)}
-                className="px-3 py-1.5 rounded text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors"
+                className="px-3 py-1.5 rounded text-xs font-medium text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
               >
                 Close
               </button>

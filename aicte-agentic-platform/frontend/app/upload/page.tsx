@@ -120,7 +120,7 @@ export default function UploadPage() {
 
 
   return (
-    <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
+    <div className="flex h-screen w-full bg-[#08090d] overflow-hidden text-slate-100">
       <Sidebar className="hidden md:flex" />
 
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
@@ -246,7 +246,7 @@ export default function UploadPage() {
 
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border border-dashed border-slate-300 rounded-lg p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="border border-dashed border-white/20 rounded-lg p-8 text-center bg-white/[0.02] hover:bg-white/[0.05] transition-colors cursor-pointer"
               >
                 <UploadCloud className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                 <div className="text-xs font-medium text-slate-800">

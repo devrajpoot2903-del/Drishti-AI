@@ -2,7 +2,14 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import crypto from "crypto";
 import { AuthService, UserSession } from "../services/auth.service";
 
-const JWT_SECRET = process.env.JWT_SECRET || "aicte_secure_session_secret_key_2026";
+// Stable JWT secret configured via environment variables
+export function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    return "aicte_super_secret_jwt_key_development_2026";
+  }
+  return secret;
+}
 
 export interface AuthenticatedUser extends UserSession {}
 
@@ -13,11 +20,12 @@ declare module "fastify" {
 }
 
 export function signToken(payload: UserSession): string {
+  const secret = getJwtSecret();
   const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
   const exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60); // 24 hours
   const body = Buffer.from(JSON.stringify({ ...payload, exp })).toString("base64url");
   const signature = crypto
-    .createHmac("sha256", JWT_SECRET)
+    .createHmac("sha256", secret)
     .update(`${header}.${body}`)
     .digest("base64url");
   return `${header}.${body}.${signature}`;
@@ -29,11 +37,13 @@ export function verifyToken(token: string): UserSession | null {
     if (parts.length !== 3) return null;
     const [header, body, signature] = parts;
 
+    const secret = getJwtSecret();
     const expectedSignature = crypto
-      .createHmac("sha256", JWT_SECRET)
+      .createHmac("sha256", secret)
       .update(`${header}.${body}`)
       .digest("base64url");
 
+    // Single stable secret check - no fallback or dual-secret verification
     if (signature !== expectedSignature) return null;
 
     const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf-8"));

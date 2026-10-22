@@ -6,20 +6,20 @@
   --font-mono: var(--font-geist-mono), monospace;
 
   --color-aicte-navy: #0F172A;
-  --color-aicte-navy-dark: #090D16;
-  --color-aicte-navy-light: #1E293B;
-  --color-aicte-bg: #F8FAFC;
-  --color-aicte-card: #FFFFFF;
-  --color-aicte-primary: #4F46E5;
-  --color-aicte-primary-hover: #4338CA;
-  --color-aicte-secondary: #0EA5E9;
-  --color-aicte-success: #10B981;
-  --color-aicte-warning: #F59E0B;
-  --color-aicte-error: #EF4444;
-  --color-aicte-border: #E2E8F0;
-  --color-aicte-text: #1E293B;
-  --color-aicte-muted: #64748B;
-  --color-aicte-subtle: #94A3B8;
+  --color-aicte-navy-dark: #08090d;
+  --color-aicte-navy-light: #181a21;
+  --color-aicte-bg: #08090d;
+  --color-aicte-card: #101116;
+  --color-aicte-primary: #ef4444;
+  --color-aicte-primary-hover: #dc2626;
+  --color-aicte-secondary: #1f2937;
+  --color-aicte-success: #10b981;
+  --color-aicte-warning: #f59e0b;
+  --color-aicte-error: #ef4444;
+  --color-aicte-border: rgba(255, 255, 255, 0.09);
+  --color-aicte-text: #f8fafc;
+  --color-aicte-muted: #9ca3af;
+  --color-aicte-subtle: #64748b;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -35,46 +35,144 @@
 }
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #1E293B;
-  --card: #FFFFFF;
-  --card-foreground: #1E293B;
-  --popover: #FFFFFF;
-  --popover-foreground: #1E293B;
-  --primary: #4F46E5;
-  --primary-foreground: #FFFFFF;
-  --secondary: #0EA5E9;
-  --secondary-foreground: #FFFFFF;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
-  --accent: #EEF2FF;
-  --accent-foreground: #4F46E5;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #4F46E5;
+  --background: #08090d;
+  --foreground: #f8fafc;
+  --card: #101116;
+  --card-foreground: #f8fafc;
+  --popover: #101116;
+  --popover-foreground: #f8fafc;
+  --primary: #ef4444;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #181a21;
+  --muted-foreground: #9ca3af;
+  --accent: #1f2937;
+  --accent-foreground: #ef4444;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #ef4444;
   --radius: 0.5rem;
 
-  --sidebar: #0F172A;
-  --sidebar-foreground: #F8FAFC;
-  --sidebar-primary: #4F46E5;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1E293B;
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border: #1E293B;
+  --sidebar: #0a0b10;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #ef4444;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #15161d;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+
+  /* Drishti AI Design System Tokens */
+  --drishti-bg: #08090d;
+  --drishti-surface: #101116;
+  --drishti-surface-hover: #181a21;
+
+  --drishti-primary: #ef4444;
+  --drishti-primary-hover: #dc2626;
+
+  --drishti-text: #f8fafc;
+  --drishti-muted: #9ca3af;
+
+  --drishti-border: rgba(255, 255, 255, 0.09);
+  --drishti-glass: rgba(20, 21, 28, 0.72);
 }
 
 @layer base {
   * {
-    border-color: #E2E8F0;
+    border-color: rgba(255, 255, 255, 0.09);
   }
 
   body {
-    background-color: #F8FAFC;
-    color: #1E293B;
+    background: var(--drishti-bg);
+    color: var(--drishti-text);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
+  }
+}
+
+.drishti-glass {
+  background: var(--drishti-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid var(--drishti-border);
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.drishti-card {
+  background: #101116;
+  border: 1px solid var(--drishti-border);
+  border-radius: 14px;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.drishti-card:hover {
+  background: #15161d;
+  border-color: rgba(239, 68, 68, 0.22);
+}
+
+.drishti-button {
+  background: var(--drishti-primary);
+  color: white;
+
+  border-radius: 10px;
+  padding: 10px 16px;
+
+  font-weight: 500;
+  cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease;
+}
+
+.drishti-button:hover {
+  background: var(--drishti-primary-hover);
+}
+
+.drishti-button:active {
+  transform: scale(0.97);
+}
+
+.drishti-muted {
+  color: var(--drishti-muted);
+}
+
+.drishti-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--drishti-border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: white;
+  outline: none;
+}
+
+.drishti-input:focus {
+  border-color: rgba(239, 68, 68, 0.65);
+}
+
+.drishti-accent-glow {
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -85,14 +183,70 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #08090d;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Dark theme harmonizations for existing enterprise components */
+.bg-white {
+  background-color: #101116;
+}
+
+.text-slate-900 {
+  color: #f8fafc;
+}
+
+.text-slate-800 {
+  color: #f1f5f9;
+}
+
+.text-slate-700 {
+  color: #e2e8f0;
+}
+
+.text-slate-600 {
+  color: #94a3b8;
+}
+
+.text-slate-500 {
+  color: #9ca3af;
+}
+
+.bg-slate-50,
+[class*="bg-slate-50"] {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.bg-slate-100,
+[class*="bg-slate-100"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.border-slate-200,
+.border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Eliminate white hover/click flashes on table rows and interactive items */
+tr:hover,
+tr:active,
+tr:focus,
+tr[class*="hover:"]:hover,
+[class*="hover:bg-slate-"]:hover,
+[class*="active:bg-slate-"]:active {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+input,
+select,
+textarea {
+  color-scheme: dark;
 }

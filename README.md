@@ -123,7 +123,18 @@ aicte-agentic-platform/
 
 ## 4. Local Execution & Quick Start
 
-### Step 1: Install Dependencies
+### Quick One-Command Launch:
+Run the consolidated startup script:
+```bash
+./start.sh
+```
+This automatically launches all three services (Python AI Service, Fastify Gateway, and Next.js Frontend) concurrently with clean process management (press `Ctrl+C` to stop all services).
+
+---
+
+### Alternative: Individual Terminal Execution
+
+#### Step 1: Install Dependencies
 
 ```bash
 # Gateway

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { DashboardHero } from "@/components/drishti/dashboard-hero";
 import { StatCardsGrid } from "@/components/dashboard/stat-card";
 import { RecentApplicationsTable } from "@/components/dashboard/recent-applications";
 import { AgentActivityPanel } from "@/components/dashboard/agent-activity";
@@ -54,7 +55,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
+    <div className="flex h-screen w-full bg-[#08090d] overflow-hidden text-slate-100">
       {/* Sidebar Navigation */}
       <Sidebar className="hidden md:flex" />
 
@@ -69,6 +70,9 @@ export default function DashboardPage() {
 
         {/* Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Drishti AI Premium Hero Header */}
+          <DashboardHero />
+
           {/* Three Statistics Cards: Total, Processed, Needs Review */}
           <StatCardsGrid stats={stats} loading={loading} error={error} />
 

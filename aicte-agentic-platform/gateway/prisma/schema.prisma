@@ -106,6 +106,9 @@ model Document {
   ocrStatus           String               @default("NOT_PROCESSED")
   extractedText       String?
   uploadedAt          DateTime             @default(now())
+  revision            Int                  @default(1)
+  replacesId          String?
+  isCurrent           Boolean              @default(true)
   extractedFields     ExtractedField[]
   verificationResults VerificationResult[]
   findings            Finding[]
@@ -181,14 +184,18 @@ model Evidence {
 
 model VerificationResult {
   id              String   @id @default(uuid())
+  applicationId   String?
   documentId      String
   document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
   checkType       String // "QR", "DIGITAL_SIGNATURE", "ISSUER_REGISTRY"
+  method          String? // Alias for checkType
   status          String // "VERIFIED", "MISMATCH", "EXPIRED", "SOURCE_UNAVAILABLE"
   issuerReference String?
+  source          String? // Alias for issuerReference
   details         String? // JSON string
   verifiedAt      DateTime @default(now())
 
+  @@index([applicationId])
   @@index([documentId])
   @@index([checkType])
 }

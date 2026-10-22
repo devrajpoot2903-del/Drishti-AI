@@ -94,7 +94,7 @@ export default function ReviewPage() {
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
+    <div className="flex h-screen w-full bg-[#08090d] overflow-hidden text-slate-100">
       <Sidebar className="hidden md:flex" />
 
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
@@ -237,18 +237,18 @@ export default function ReviewPage() {
                 </div>
 
                 {/* Action Controls: Approve | Request Rectification | Escalate */}
-                <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 flex-wrap">
+                <div className="pt-2 flex items-center justify-end gap-2 border-t border-white/10 flex-wrap">
                   <button
                     onClick={() => handleAction(app.id, "escalate")}
                     disabled={isSubmitting[app.id]}
-                    className="px-3 py-1.5 rounded text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 rounded text-xs font-medium text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors disabled:opacity-50"
                   >
                     Escalate
                   </button>
                   <button
                     onClick={() => handleAction(app.id, "rectify")}
                     disabled={isSubmitting[app.id]}
-                    className="px-3 py-1.5 rounded text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 rounded text-xs font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
                   >
                     Request Rectification
                   </button>

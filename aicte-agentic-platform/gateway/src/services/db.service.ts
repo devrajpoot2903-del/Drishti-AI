@@ -12,6 +12,7 @@ export interface DatabaseState {
   documents: any[];
   findings: any[];
   evidence: any[];
+  verificationResults: any[];
   auditLogs: any[];
   jobs: any[];
   config: {
@@ -32,6 +33,7 @@ function loadLocalDb(): DatabaseState {
     documents: [],
     findings: [],
     evidence: [],
+    verificationResults: [],
     auditLogs: [],
     jobs: [],
     config: {
@@ -127,7 +129,16 @@ export const db = {
   // Documents
   createDocument: (doc: any) => {
     const state = loadLocalDb();
-    const newDoc = { ...doc, id: doc.id || crypto.randomUUID(), uploadedAt: new Date().toISOString() };
+    const newDoc = {
+      ...doc,
+      id: doc.id || crypto.randomUUID(),
+      uploadedAt: new Date().toISOString(),
+      revision: doc.revision ?? 1,
+      replacesId: doc.replacesId ?? null,
+      isCurrent: doc.isCurrent ?? true,
+      extractedText: doc.extractedText ?? "",
+      extractedFields: doc.extractedFields ?? []
+    };
     state.documents.push(newDoc);
     saveLocalDb(state);
     return newDoc;
@@ -135,6 +146,70 @@ export const db = {
   findDocumentById: (id: string) => {
     const state = loadLocalDb();
     return state.documents.find((d) => d.id === id);
+  },
+  findDocumentsByApplicationId: (appId: string) => {
+    const state = loadLocalDb();
+    return state.documents.filter((d) => d.applicationId === appId);
+  },
+  updateDocument: (id: string, updates: any) => {
+    const state = loadLocalDb();
+    const idx = state.documents.findIndex((d) => d.id === id);
+    if (idx === -1) return null;
+    state.documents[idx] = { ...state.documents[idx], ...updates };
+    saveLocalDb(state);
+    return state.documents[idx];
+  },
+  replaceDocumentVersion: (appId: string, prevDocId: string, newDocId: string) => {
+    const state = loadLocalDb();
+    const prevIdx = state.documents.findIndex((d) => d.id === prevDocId && d.applicationId === appId);
+    const newIdx = state.documents.findIndex((d) => d.id === newDocId && d.applicationId === appId);
+    if (prevIdx === -1 || newIdx === -1) return null;
+
+    const previousDoc = state.documents[prevIdx];
+    const newRevision = (previousDoc.revision || 1) + 1;
+
+    state.documents[prevIdx] = {
+      ...previousDoc,
+      isCurrent: false
+    };
+
+    state.documents[newIdx] = {
+      ...state.documents[newIdx],
+      revision: newRevision,
+      replacesId: previousDoc.id,
+      isCurrent: true
+    };
+
+    saveLocalDb(state);
+    return {
+      previousDocument: state.documents[prevIdx],
+      newDocument: state.documents[newIdx]
+    };
+  },
+
+  // Verification Results
+  createVerificationResult: (result: any) => {
+    const state = loadLocalDb();
+    const record = {
+      id: result.id || crypto.randomUUID(),
+      applicationId: result.applicationId,
+      documentId: result.documentId,
+      method: result.method || result.checkType || "QR",
+      checkType: result.method || result.checkType || "QR",
+      status: result.status,
+      source: result.source || result.issuerReference || null,
+      issuerReference: result.source || result.issuerReference || null,
+      details: result.details || {},
+      verifiedAt: result.verifiedAt || new Date().toISOString()
+    };
+    state.verificationResults = state.verificationResults || [];
+    state.verificationResults.push(record);
+    saveLocalDb(state);
+    return record;
+  },
+  findVerificationResultsByApplicationId: (appId: string) => {
+    const state = loadLocalDb();
+    return (state.verificationResults || []).filter((r) => r.applicationId === appId);
   },
 
   // Findings & Evidence

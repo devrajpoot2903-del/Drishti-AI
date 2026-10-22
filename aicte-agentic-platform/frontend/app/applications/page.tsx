@@ -30,7 +30,7 @@ export default function ApplicationsPage() {
   }, []);
 
   return (
-    <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
+    <div className="flex h-screen w-full bg-[#08090d] overflow-hidden text-slate-100">
       <Sidebar className="hidden md:flex" />
 
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">

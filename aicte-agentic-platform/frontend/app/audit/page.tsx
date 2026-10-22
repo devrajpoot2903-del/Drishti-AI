@@ -38,7 +38,7 @@ export default function AuditPage() {
   );
 
   return (
-    <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
+    <div className="flex h-screen w-full bg-[#08090d] overflow-hidden text-slate-100">
       <Sidebar className="hidden md:flex" />
 
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
@@ -109,7 +109,7 @@ export default function AuditPage() {
                   {filteredLogs.map((log) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-slate-50/70 transition-colors"
+                      className="hover:bg-white/[0.04] active:bg-white/[0.06] transition-colors"
                     >
                       <td className="py-3 px-4 font-mono text-[11px] text-slate-500 whitespace-nowrap">
                         {log.timestamp}

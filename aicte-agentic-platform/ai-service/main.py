@@ -9,6 +9,8 @@ from agents.forensics import run_forensics_agent
 from agents.verification import run_verification_agent
 from agents.compliance import run_compliance_agent
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 app = FastAPI(
     title="AICTE Agentic AI Service",
     description="Python FastAPI service for document processing, ELA forensics, verification ladder, and LangGraph orchestration.",
@@ -67,16 +69,27 @@ def process_application(payload: ApplicationPayload):
         options = {
             "existingDocuments": payload.existingDocuments,
             "existingFacultyIds": payload.existingFacultyIds,
-            "storageBase": os.getenv("STORAGE_DIR", "../storage"),
+            "storageBase": os.path.join(PROJECT_ROOT, "storage"),
+            "storageDir": os.path.join(PROJECT_ROOT, "storage", "documents"),
+            "registryPath": os.path.join(PROJECT_ROOT, "data", "mock-registry", "issuer_records.json"),
+            "rulesPath": os.path.join(PROJECT_ROOT, "data", "rules", "aph_2026_27_rules.json"),
         }
         result = execute_agent_pipeline(app_dict, options=options)
         return {
             "applicationId": payload.id,
             "riskScore": result.get("riskScore", 0.0),
+            "documentAuthenticityRisk": result.get("documentAuthenticityRisk", 0.0),
+            "applicationComplianceRisk": result.get("applicationComplianceRisk", 0.0),
+            "authenticityAssessment": result.get("authenticityAssessment", "INCONCLUSIVE"),
+            "complianceAssessment": result.get("complianceAssessment", "COMPLIANT"),
+            "authenticityExplanation": result.get("authenticityExplanation", ""),
+            "complianceExplanation": result.get("complianceExplanation", ""),
             "recommendedStatus": result.get("recommendedStatus", "CLEARED"),
             "findings": result.get("findings", []),
             "executedAgents": result.get("executed_agents", []),
-            "intakePlan": result.get("intake_plan", {})
+            "intakePlan": result.get("intake_plan", {}),
+            "extractedDocuments": result.get("extracted_documents", []),
+            "verificationChecks": result.get("verification_checks", [])
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

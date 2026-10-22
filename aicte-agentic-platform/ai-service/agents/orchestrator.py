@@ -1,4 +1,6 @@
+import os
 import time
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from graph.workflow import (
     build_orchestrator_graph,
     intake_step,
@@ -22,10 +24,10 @@ def execute_agent_pipeline(application_data: dict, options: dict = None) -> dict
         "application": application_data,
         "existing_documents": opts.get("existingDocuments", []),
         "existing_faculty": opts.get("existingFacultyIds", []),
-        "storage_base": opts.get("storageBase", "../storage"),
-        "storage_dir": opts.get("storageDir", "../storage/documents"),
-        "registry_path": opts.get("registryPath", "../data/mock-registry/issuer_records.json"),
-        "rules_path": opts.get("rulesPath", "../data/rules/aph_2026_27_rules.json"),
+        "storage_base": opts.get("storageBase", os.path.join(PROJECT_ROOT, "storage")),
+        "storage_dir": opts.get("storageDir", os.path.join(PROJECT_ROOT, "storage", "documents")),
+        "registry_path": opts.get("registryPath", os.path.join(PROJECT_ROOT, "data", "mock-registry", "issuer_records.json")),
+        "rules_path": opts.get("rulesPath", os.path.join(PROJECT_ROOT, "data", "rules", "aph_2026_27_rules.json")),
         "findings": [],
         "executed_agents": []
     }

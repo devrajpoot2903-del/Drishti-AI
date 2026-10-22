@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
+import { DrishtiAssistant } from "@/components/drishti/drishti-assistant";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,11 +16,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AICTE Regulatory Intelligence Platform | Agentic Decision Support",
-  description: "Next-generation agentic decision-support and regulatory scrutiny platform for AICTE institutional approvals, forensic verification, and compliance.",
+  title: "Drishti AI | Agentic Regulatory Decision Intelligence",
+  description:
+    "Next-generation agentic decision-support and regulatory scrutiny platform for institutional approvals, forensic verification, and compliance.",
 };
-
-import { AuthProvider } from "@/lib/auth-context";
 
 export default function RootLayout({
   children,
@@ -25,13 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#F8FAFC] text-[#1E293B]">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full dark antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-[#08090d] text-[#f8fafc] font-sans selection:bg-red-500/30 selection:text-white">
         <AuthProvider>
           {children}
+          <DrishtiAssistant />
+          <Toaster theme="dark" richColors position="top-right" />
         </AuthProvider>
       </body>
     </html>
   );
 }
-

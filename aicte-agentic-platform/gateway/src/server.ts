@@ -1,3 +1,4 @@
+import "dotenv/config";
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
@@ -12,6 +13,11 @@ import { findingsRoutes } from "./routes/findings.routes";
 import { auditRoutes } from "./routes/audit.routes";
 import { analyticsRoutes } from "./routes/analytics.routes";
 import { workflowRoutes } from "./routes/workflow.routes";
+import { executionRoutes } from "./routes/execution.routes";
+import { verificationRoutes } from "./routes/verification.routes";
+import { ocrRoutes } from "./routes/ocr.routes";
+import { resubmissionRoutes } from "./routes/resubmission.routes";
+import { reportRoutes } from "./routes/report.routes";
 
 dotenv.config();
 
@@ -57,6 +63,11 @@ export async function buildServer() {
   await app.register(auditRoutes);
   await app.register(analyticsRoutes);
   await app.register(workflowRoutes);
+  await app.register(executionRoutes);
+  await app.register(verificationRoutes);
+  await app.register(ocrRoutes);
+  await app.register(resubmissionRoutes);
+  await app.register(reportRoutes);
 
   return app;
 }
