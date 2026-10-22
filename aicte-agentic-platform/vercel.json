@@ -1,0 +1,39 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "ai-service": {
+      "root": "ai-service",
+      "framework": "fastapi"
+    },
+    "frontend": {
+      "root": "frontend",
+      "framework": "nextjs"
+    },
+    "gateway": {
+      "root": "gateway",
+      "framework": "fastify",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "ai-service",
+          "format": "url",
+          "env": "AI_SERVICE_URL"
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "gateway"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
+    }
+  ]
+}
