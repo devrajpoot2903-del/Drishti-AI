@@ -64,11 +64,15 @@ export interface DocumentItem {
 
 export interface AuditEvent {
   id: string;
+  sequence?: number;
   timestamp: string;
   appId: string;
   actor: string;
+  actorRole?: string;
   action: string;
   hash: string;
+  previousHash?: string;
+  currentHash?: string;
   hashChainStatus: "Verified" | "Unverified" | "Pending";
 }
 

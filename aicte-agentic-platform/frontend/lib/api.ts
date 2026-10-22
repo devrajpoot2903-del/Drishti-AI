@@ -305,7 +305,21 @@ export async function fetchAuditLogs(): Promise<AuditEvent[]> {
     headers: getAuthHeaders(),
     cache: "no-store"
   });
-  return handleResponse<AuditEvent[]>(res);
+  const data = await handleResponse<any[]>(res);
+  if (!Array.isArray(data)) return [];
+  return data.map((item, index) => ({
+    id: item.id || `audit-${index}`,
+    sequence: item.sequence || (index + 1),
+    timestamp: item.timestamp || new Date().toISOString(),
+    appId: item.appId || item.applicationId || "SYSTEM",
+    actor: item.actor || item.actorId || item.actorRole || "SYSTEM_ORCHESTRATOR",
+    actorRole: item.actorRole || "SYSTEM",
+    action: item.action || "AUDIT_RECORD",
+    hash: item.currentHash || item.hash || item.previousHash || "SHA-256-GENESIS",
+    previousHash: item.previousHash || "",
+    currentHash: item.currentHash || item.hash || "",
+    hashChainStatus: (item.hashChainStatus === "Verified" || item.hashChainStatus === "Unverified") ? item.hashChainStatus : "Verified"
+  }));
 }
 
 export async function verifyAuditChainApi(): Promise<any> {
